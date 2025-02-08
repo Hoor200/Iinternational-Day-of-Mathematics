@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الشيفرة السرية - International Day of Mathematics</title>
+  <style>
+    /* الأنماط العامة */
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      direction: rtl;
+      background-color: #87CEEB; /* سماوي */
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      position: relative;
+    }
+    /* صفحة اللغز الرئيسية (بدون شبكة) */
+    #puzzleContainer {
+      background-color: #FAF0E6; /* بيج فاتح */
+      max-width: 700px;
+      width: 90%;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin: 0 auto;
+      /* توسيط المحتوى عموديًا */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    /* العنوان العلوي الخاص باليوم الدولي للرياضيات */
+    .top-header {
+      color: #000080; /* كحلي */
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+    h1 {
+      color: #87CEEB;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+    .squares {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      /* الترتيب الطبيعي: من اليسار إلى اليمين */
+    }
+    .square {
+      width: 50px;
+      height: 50px;
+      border: 2px solid #888;
+      margin: 5px;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #FDF5E6;
+    }
+    .question-container {
+      margin-bottom: 20px;
+    }
+    .question-container p {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      font-size: 18px;
+      width: 220px;
+      border: 1px solid #888;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 16px;
+      font-size: 18px;
+      margin-left: 8px;
+      background-color: #87CEEB;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+    }
+    .feedback {
+      color: #C00;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    .hidden {
+      display: none;
+    }
+    /* عند انتهاء اللغز تظهر العبارة "شكرا أستاذة ريم" مكان منطقة الأسئلة */
+    .final-message {
+      font-size: 24px;
+      font-weight: bold;
+      color: #87CEEB;
+      margin-top: 20px;
+    }
+    
+    /* صفحة الشكر */
+    #thankYouContainer {
+      background-color: #FAF0E6; /* بيج فاتح */
+      min-height: 100vh;
+      padding: 20px;
+      display: none; /* مخفية مبدئيًا */
+      /* توسيط المحتوى عموديًا وأفقيًا */
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    /* شبكة هندسية تظهر فقط في صفحة الشكر */
+    #thankYouContainer::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px),
+        linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px);
+      background-size: 20px 20px;
+      z-index: 1;
+    }
+    /* SVG لرسم نظام الإحداثيات والقلب */
+    #thankSvg {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+    }
+    .axis-label {
+      fill: #888;
+      font-size: 3;
+    }
+    /* الرسالة النهائية في صفحة الشكر - مسودة بيضاء */
+    .final-thankyou {
+      display: none;
+      margin: 20px auto;
+      max-width: 500px;
+      text-align: center;
+      font-size: 24px;
+      padding: 20px;
+      background: #fff;
+      border: 2px solid #87CEEB;
+      border-radius: 10px;
+      z-index: 3;
+      position: relative;
+    }
+    
+    /* تذييل الموقع */
+    footer {
+      font-size: 20px;
+      color: #888;
+      text-align: center;
+      margin-top: 20px;
+      padding: 10px 0;
+    }
+    
+    /* استعلام وسائط لجوالات أصغر */
+    @media only screen and (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      #puzzleContainer {
+        padding: 15px;
+      }
+      .top-header {
+        font-size: 1.25rem;
+      }
+      h1 {
+        font-size: 1.75rem;
+      }
+      .square {
+        width: 40px;
+        height: 40px;
+        margin: 4px;
+        font-size: 22px;
+      }
+      .question-container p {
+        font-size: 18px;
+      }
+      input[type="text"] {
+        width: 180px;
+        font-size: 16px;
+      }
+      button {
+        padding: 8px 12px;
+        font-size: 16px;
+      }
+      .final-message, .final-thankyou {
+        font-size: 20px;
+        padding: 15px;
+        max-width: 90%;
+      }
+      footer {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- صفحة اللغز الرئيسية -->
+  <div id="puzzleContainer">
+    <!-- عنوان إضافي بالأعلى -->
+    <div class="top-header">Ainternational Day of Mathematics</div>
+    <h1>الشفرة السرية</h1>
+    <div class="squares" id="squares">
+      <!-- 13 مربعًا (الترتيب الطبيعي من اليسار إلى اليمين) -->
+      <div class="square" id="square-0"></div>
+      <div class="square" id="square-1"></div>
+      <div class="square" id="square-2"></div>
+      <div class="square" id="square-3"></div>
+      <div class="square" id="square-4"></div>
+      <div class="square" id="square-5"></div>
+      <div class="square" id="square-6"></div>
+      <div class="square" id="square-7"></div>
+      <div class="square" id="square-8"></div>
+      <div class="square" id="square-9"></div>
+      <div class="square" id="square-10"></div>
+      <div class="square" id="square-11"></div>
+      <div class="square" id="square-12"></div>
+    </div>
+    <div class="question-container" id="question-container">
+      <p id="question-text"></p>
+      <input type="text" id="answer-input" placeholder="إجابتك">
+      <button id="submit-btn">إرسال</button>
+      <p class="feedback" id="feedback"></p>
+    </div>
+    <!-- عند انتهاء حل اللغز يتم إخفاء منطقة الأسئلة وعرض العبارة "شكرا أستاذة ريم" -->
+    <div class="final-message hidden" id="final-message">
+      شكرا أستاذة ريم
+    </div>
+  </div>
+  
+  <!-- صفحة الشكر (تظهر بعد انتهاء اللغز) -->
+  <div id="thankYouContainer">
+    <!-- SVG لرسم نظام الإحداثيات والقلب -->
+    <svg id="thankSvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+      <g id="grid">
+        <line x1="10" y1="0" x2="10" y2="100" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="20" y1="0" x2="20" y2="100" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="30" y1="0" x2="30" y2="100" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="40" y1="0" x2="40" y2="100" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="50" y1="0" x2="50" y2="100" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="60" y1="0" x2="60" y2="100" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="70" y1="0" x2="70" y2="100" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="80" y1="0" x2="80" y2="100" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="90" y1="0" x2="90" y2="100" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="0" y1="10" x2="100" y2="10" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="0" y1="20" x2="100" y2="20" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="0" y1="30" x2="100" y2="30" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="0" y1="40" x2="100" y2="40" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="0" y1="50" x2="100" y2="50" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="0" y1="60" x2="100" y2="60" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="0" y1="70" x2="100" y2="70" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="0" y1="80" x2="100" y2="80" stroke="#ccc" stroke-width="0.2"/>
+        <line x1="0" y1="90" x2="100" y2="90" stroke="#ccc" stroke-width="0.2"/>
+      </g>
+      <line x1="50" y1="0" x2="50" y2="100" stroke="#888" stroke-width="0.5"/>
+      <line x1="0" y1="50" x2="100" y2="50" stroke="#888" stroke-width="0.5"/>
+      <text x="95" y="52" text-anchor="end" class="axis-label">x</text>
+      <text x="52" y="5" text-anchor="start" class="axis-label">y</text>
+      <path id="heartPath" d="M50 30 C35 15, 10 30, 50 70 C90 30, 65 15, 50 30 Z" fill="none" stroke="#E57373" stroke-width="1" stroke-dasharray="200" stroke-dashoffset="200"/>
+    </svg>
+    <!-- الرسالة النهائية في صفحة الشكر -->
+    <div class="final-thankyou" id="finalThankyou">
+      أستاذة ريم … انتِ تشبهين ( الـ ∞ ) لا يوجد نهاية لإبداعك وعطائك ومثل ( الـ ∫ ) دائماً تكملين كل فكرة وتدمجينها في محيط جديد من المعرفة ، كل حصة ممتعة معك هي تشبه ( الـ π ) دائماً مليئة بالعمق والجمال ، ومع كل حصة أشعر اني أضيف مشتقة جديدة من الفهم لشغفي بالرياضيات<br>
+      شكراً لكِ على جعل الرياضيات مثل الدالة المتزايدة تنمو وتزداد بمرور الوقت واتقدم في سلسلة لا نهائية من الإبداع والمعرفة
+    </div>
+  </div>
+  
+  <!-- تذييل الموقع -->
+  <footer>
+    صنع بواسطة حور المطيري 2025
+  </footer>
+
+  <script>
+    // دالة رسم القلب مع الأنيميشن باستخدام SVG (سرعة متوسطة)
+    function animateHeart() {
+      const heartPath = document.getElementById('heartPath');
+      let dashOffset = 200;
+      const interval = setInterval(() => {
+        dashOffset -= 3;
+        if (dashOffset <= 0) {
+          dashOffset = 0;
+          clearInterval(interval);
+          // فور انتهاء رسم القلب، إخفاء الـ SVG وعرض الرسالة النهائية
+          document.getElementById("thankSvg").style.display = "none";
+          document.getElementById("finalThankyou").style.display = "block";
+        }
+        heartPath.style.strokeDashoffset = dashOffset;
+      }, 60);
+    }
+  </script>
+
+  <script>
+    // كود صفحة اللغز
+    // الأحرف المطلوبة بالترتيب الطبيعي (من اليسار إلى اليمين):
+    // 0: ش، 1: ك، 2: ر، 3: ا، 4: أ، 5: س، 6: ت، 7: ا، 8: ذ، 9: ة، 10: ر، 11: ي، 12: م
+    const puzzles = [
+      { question: "5 + 3 = ?", answer: "8", letter: "ش" },
+      { question: "10 - 4 = ?", answer: "6", letter: "ك" },
+      { question: "2 * 3 = ?", answer: "6", letter: "ر" },
+      { question: "12 / 4 = ?", answer: "3", letter: "ا" },
+      { question: "7 + 2 = ?", answer: "9", letter: "أ" },
+      { question: "15 - 5 = ?", answer: "10", letter: "س" },
+      { question: "3 * 4 = ?", answer: "12", letter: "ت" },
+      { question: "16 / 2 = ?", answer: "8", letter: "ا" },
+      { question: "9 - 3 = ?", answer: "6", letter: "ذ" },
+      { question: "8 + 4 = ?", answer: "12", letter: "ة" },
+      { question: "6 * 2 = ?", answer: "12", letter: "ر" },
+      { question: "20 / 5 = ?", answer: "4", letter: "ي" },
+      { question: "14 - 7 = ?", answer: "7", letter: "م" }
+    ];
+    
+    let currentPuzzle = 0;
+    const questionText = document.getElementById("question-text");
+    const answerInput = document.getElementById("answer-input");
+    const submitBtn = document.getElementById("submit-btn");
+    const feedback = document.getElementById("feedback");
+    const finalMessageDiv = document.getElementById("final-message");
+    const questionContainer = document.getElementById("question-container");
+    
+    function loadPuzzle() {
+      if (currentPuzzle < puzzles.length) {
+        questionText.textContent = puzzles[currentPuzzle].question;
+        answerInput.value = "";
+        feedback.textContent = "";
+      } else {
+        // انتهت جميع الألغاز: إخفاء منطقة الأسئلة وعرض العبارة "شكرا أستاذة ريم"
+        questionContainer.classList.add("hidden");
+        finalMessageDiv.classList.remove("hidden");
+        // بعد 1.5 ثانية، الانتقال إلى صفحة الشكر
+        setTimeout(() => {
+          document.getElementById("puzzleContainer").style.display = "none";
+          document.getElementById("thankYouContainer").style.display = "flex";
+          animateHeart();
+        }, 1500);
+      }
+    }
+    
+    submitBtn.addEventListener("click", function() {
+      const userAnswer = answerInput.value.trim();
+      if (userAnswer === puzzles[currentPuzzle].answer) {
+        // تعبئة المربع الحالي (من اليسار إلى اليمين)
+        document.getElementById("square-" + currentPuzzle).textContent = puzzles[currentPuzzle].letter;
+        currentPuzzle++;
+        loadPuzzle();
+      } else {
+        feedback.textContent = "إجابة خاطئة، حاول مرة أخرى.";
+      }
+    });
+    
+    answerInput.addEventListener("keyup", function(event) {
+      if (event.key === "Enter") {
+        submitBtn.click();
+      }
+    });
+    
+    loadPuzzle();
+  </script>
+</body>
+</html>
